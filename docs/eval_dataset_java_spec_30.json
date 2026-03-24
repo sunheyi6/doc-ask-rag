@@ -1,0 +1,222 @@
+[
+  {
+    "id": "R01",
+    "type": "related",
+    "question": "Java开发手册中对类名的命名有什么要求？",
+    "target_filename": "阿里巴巴Java开发手册(终极版).pdf",
+    "expected_any": [
+      "UpperCamelCase",
+      "驼峰形式"
+    ]
+  },
+  {
+    "id": "R02",
+    "type": "related",
+    "question": "如何定义常量？",
+    "target_filename": "阿里巴巴Java开发手册(终极版).pdf",
+    "expected_any": [
+      "大写",
+      "下划线"
+    ]
+  },
+  {
+    "id": "R03",
+    "type": "related",
+    "question": "代码中的命名有哪些禁止的字符？",
+    "target_filename": "阿里巴巴Java开发手册(终极版).pdf",
+    "expected_any": [
+      "下划线",
+      "美元符号"
+    ]
+  },
+  {
+    "id": "R04",
+    "type": "related",
+    "question": "POJO类中布尔类型的变量命名需要注意什么？",
+    "target_filename": "阿里巴巴Java开发手册(终极版).pdf",
+    "expected_any": [
+      "is前缀",
+      "序列化错误"
+    ]
+  },
+  {
+    "id": "R05",
+    "type": "related",
+    "question": "接口和实现类的命名有什么规则？",
+    "target_filename": "阿里巴巴Java开发手册(终极版).pdf",
+    "expected_any": [
+      "Service",
+      "Impl"
+    ]
+  },
+  {
+    "id": "R06",
+    "type": "related",
+    "question": "代码格式中对空格有什么要求？",
+    "target_filename": "阿里巴巴Java开发手册(终极版).pdf",
+    "expected_any": [
+      "空格",
+      "运算符"
+    ]
+  },
+  {
+    "id": "R07",
+    "type": "related",
+    "question": "包名命名有什么规范？",
+    "target_filename": "阿里巴巴Java开发手册(终极版).pdf",
+    "expected_any": [
+      "小写",
+      "点分隔"
+    ]
+  },
+  {
+    "id": "R08",
+    "type": "related",
+    "question": "枚举类的命名建议是什么？",
+    "target_filename": "阿里巴巴Java开发手册(终极版).pdf",
+    "expected_any": [
+      "Enum后缀",
+      "全大写"
+    ]
+  },
+  {
+    "id": "R09",
+    "type": "related",
+    "question": "代码中的大括号使用有什么规定？",
+    "target_filename": "阿里巴巴Java开发手册(终极版).pdf",
+    "expected_any": [
+      "左大括号后换行",
+      "右大括号前换行"
+    ]
+  },
+  {
+    "id": "R10",
+    "type": "related",
+    "question": "如何避免魔法值直接出现在代码中？",
+    "target_filename": "阿里巴巴Java开发手册(终极版).pdf",
+    "expected_any": [
+      "常量定义",
+      "禁止魔法值"
+    ]
+  },
+  {
+    "id": "I01",
+    "type": "irrelevant",
+    "question": "今天北京天气怎么样？",
+    "target_filename": "阿里巴巴Java开发手册(终极版).pdf"
+  },
+  {
+    "id": "I02",
+    "type": "irrelevant",
+    "question": "现在几点了？",
+    "target_filename": "阿里巴巴Java开发手册(终极版).pdf"
+  },
+  {
+    "id": "I03",
+    "type": "irrelevant",
+    "question": "美国总统是谁？",
+    "target_filename": "阿里巴巴Java开发手册(终极版).pdf"
+  },
+  {
+    "id": "I04",
+    "type": "irrelevant",
+    "question": "帮我写一首七言绝句",
+    "target_filename": "阿里巴巴Java开发手册(终极版).pdf"
+  },
+  {
+    "id": "I05",
+    "type": "irrelevant",
+    "question": "推荐三家上海好吃的火锅店",
+    "target_filename": "阿里巴巴Java开发手册(终极版).pdf"
+  },
+  {
+    "id": "I06",
+    "type": "irrelevant",
+    "question": "比特币今天多少钱？",
+    "target_filename": "阿里巴巴Java开发手册(终极版).pdf"
+  },
+  {
+    "id": "I07",
+    "type": "irrelevant",
+    "question": "地球到月球大约多远？",
+    "target_filename": "阿里巴巴Java开发手册(终极版).pdf"
+  },
+  {
+    "id": "I08",
+    "type": "irrelevant",
+    "question": "你会算 123 * 456 吗？",
+    "target_filename": "阿里巴巴Java开发手册(终极版).pdf"
+  },
+  {
+    "id": "I09",
+    "type": "irrelevant",
+    "question": "请给我讲一下黑洞是什么",
+    "target_filename": "阿里巴巴Java开发手册(终极版).pdf"
+  },
+  {
+    "id": "I10",
+    "type": "irrelevant",
+    "question": "帮我规划一趟去日本的旅游行程",
+    "target_filename": "阿里巴巴Java开发手册(终极版).pdf"
+  },
+  {
+    "id": "M01",
+    "type": "meta",
+    "question": "你是谁",
+    "expected_contains": "我是小A"
+  },
+  {
+    "id": "M02",
+    "type": "meta",
+    "question": "你是谁呀",
+    "expected_contains": "我是小A"
+  },
+  {
+    "id": "M03",
+    "type": "meta",
+    "question": "你叫什么名字",
+    "expected_contains": "我是小A"
+  },
+  {
+    "id": "M04",
+    "type": "meta",
+    "question": "你叫什么名字啊",
+    "expected_contains": "我是小A"
+  },
+  {
+    "id": "M05",
+    "type": "meta",
+    "question": "你能做什么",
+    "expected_contains": "我是小A"
+  },
+  {
+    "id": "M06",
+    "type": "meta",
+    "question": "你能帮我做什么呀",
+    "expected_contains": "我是小A"
+  },
+  {
+    "id": "M07",
+    "type": "meta",
+    "question": "你有什么限制",
+    "expected_contains": "作为小A"
+  },
+  {
+    "id": "M08",
+    "type": "meta",
+    "question": "你不会什么",
+    "expected_contains": "作为小A"
+  },
+  {
+    "id": "M09",
+    "type": "meta",
+    "question": "你好，你是谁",
+    "expected_contains": "我是小A"
+  },
+  {
+    "id": "M10",
+    "type": "meta",
+    "question": "自我介绍一下吧",
+    "expected_contains": "我是小A"
+  }
+]

@@ -1,0 +1,221 @@
+[
+  {
+    "id": "R01",
+    "type": "related",
+    "question": "张三的工作经历有哪些？",
+    "target_filename": "resume.pdf",
+    "expected_any": [
+      "阿里云",
+      "腾讯"
+    ]
+  },
+  {
+    "id": "R02",
+    "type": "related",
+    "question": "张三在阿里云担任什么职位？",
+    "target_filename": "resume.pdf",
+    "expected_any": [
+      "高级 Java 开发工程师"
+    ]
+  },
+  {
+    "id": "R03",
+    "type": "related",
+    "question": "张三的技术栈包括哪些内容？",
+    "target_filename": "resume.pdf",
+    "expected_any": [
+      "Java",
+      "Spring Boot",
+      "MySQL",
+      "Redis",
+      "Kafka"
+    ]
+  },
+  {
+    "id": "R04",
+    "type": "related",
+    "question": "张三参与过哪些项目？",
+    "target_filename": "resume.pdf",
+    "expected_any": [
+      "高并发订单系统",
+      "数据库查询性能优化"
+    ]
+  },
+  {
+    "id": "R05",
+    "type": "related",
+    "question": "张三在腾讯的职位是什么？",
+    "target_filename": "resume.pdf",
+    "expected_any": [
+      "后端开发工程师"
+    ]
+  },
+  {
+    "id": "R06",
+    "type": "related",
+    "question": "张三在项目中实现了什么？",
+    "target_filename": "resume.pdf",
+    "expected_any": [
+      "高并发订单系统",
+      "QPS 达到 10万+"
+    ]
+  },
+  {
+    "id": "R07",
+    "type": "related",
+    "question": "张三在简历中提到了哪些技术能力？",
+    "target_filename": "resume.pdf",
+    "expected_any": [
+      "分布式系统设计",
+      "微服务架构"
+    ]
+  },
+  {
+    "id": "R08",
+    "type": "related",
+    "question": "张三在数据库优化方面取得了什么成果？",
+    "target_filename": "resume.pdf",
+    "expected_any": [
+      "响应时间从 500ms 降至 50ms"
+    ]
+  },
+  {
+    "id": "R09",
+    "type": "related",
+    "question": "张三的简历文件名是什么？",
+    "target_filename": "resume.pdf",
+    "expected_any": [
+      "resume.pdf"
+    ]
+  },
+  {
+    "id": "R10",
+    "type": "related",
+    "question": "张三的工作经历时间范围是多久？",
+    "target_filename": "resume.pdf",
+    "expected_any": [
+      "2018-2020",
+      "2020-2023"
+    ]
+  },
+  {
+    "id": "I01",
+    "type": "irrelevant",
+    "question": "今天北京天气怎么样？",
+    "target_filename": "resume.pdf"
+  },
+  {
+    "id": "I02",
+    "type": "irrelevant",
+    "question": "现在几点了？",
+    "target_filename": "resume.pdf"
+  },
+  {
+    "id": "I03",
+    "type": "irrelevant",
+    "question": "美国总统是谁？",
+    "target_filename": "resume.pdf"
+  },
+  {
+    "id": "I04",
+    "type": "irrelevant",
+    "question": "帮我写一首七言绝句",
+    "target_filename": "resume.pdf"
+  },
+  {
+    "id": "I05",
+    "type": "irrelevant",
+    "question": "推荐三家上海好吃的火锅店",
+    "target_filename": "resume.pdf"
+  },
+  {
+    "id": "I06",
+    "type": "irrelevant",
+    "question": "比特币今天多少钱？",
+    "target_filename": "resume.pdf"
+  },
+  {
+    "id": "I07",
+    "type": "irrelevant",
+    "question": "地球到月球大约多远？",
+    "target_filename": "resume.pdf"
+  },
+  {
+    "id": "I08",
+    "type": "irrelevant",
+    "question": "你会算 123 * 456 吗？",
+    "target_filename": "resume.pdf"
+  },
+  {
+    "id": "I09",
+    "type": "irrelevant",
+    "question": "请给我讲一下黑洞是什么",
+    "target_filename": "resume.pdf"
+  },
+  {
+    "id": "I10",
+    "type": "irrelevant",
+    "question": "帮我规划一趟去日本的旅游行程",
+    "target_filename": "resume.pdf"
+  },
+  {
+    "id": "M01",
+    "type": "meta",
+    "question": "你是谁",
+    "expected_contains": "我是小A"
+  },
+  {
+    "id": "M02",
+    "type": "meta",
+    "question": "你是谁呀",
+    "expected_contains": "我是小A"
+  },
+  {
+    "id": "M03",
+    "type": "meta",
+    "question": "你叫什么名字",
+    "expected_contains": "我是小A"
+  },
+  {
+    "id": "M04",
+    "type": "meta",
+    "question": "你叫什么名字啊",
+    "expected_contains": "我是小A"
+  },
+  {
+    "id": "M05",
+    "type": "meta",
+    "question": "你能做什么",
+    "expected_contains": "我是小A"
+  },
+  {
+    "id": "M06",
+    "type": "meta",
+    "question": "你能帮我做什么呀",
+    "expected_contains": "我是小A"
+  },
+  {
+    "id": "M07",
+    "type": "meta",
+    "question": "你有什么限制",
+    "expected_contains": "作为小A"
+  },
+  {
+    "id": "M08",
+    "type": "meta",
+    "question": "你不会什么",
+    "expected_contains": "作为小A"
+  },
+  {
+    "id": "M09",
+    "type": "meta",
+    "question": "你好，你是谁",
+    "expected_contains": "我是小A"
+  },
+  {
+    "id": "M10",
+    "type": "meta",
+    "question": "自我介绍一下吧",
+    "expected_contains": "我是小A"
+  }
+]

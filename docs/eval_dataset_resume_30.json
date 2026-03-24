@@ -1,0 +1,194 @@
+[
+  {
+    "id": "R01",
+    "type": "related",
+    "question": "候选人在2020-2023年在哪家公司任职？",
+    "target_filename": "resume.text",
+    "expected_any": ["阿里云"]
+  },
+  {
+    "id": "R02",
+    "type": "related",
+    "question": "2018-2020 的工作单位是什么？",
+    "target_filename": "resume.text",
+    "expected_any": ["腾讯"]
+  },
+  {
+    "id": "R03",
+    "type": "related",
+    "question": "简历里提到的核心编程语言是什么？",
+    "target_filename": "resume.text",
+    "expected_any": ["Java"]
+  },
+  {
+    "id": "R04",
+    "type": "related",
+    "question": "技术栈中是否包含 Redis？",
+    "target_filename": "resume.text",
+    "expected_any": ["Redis"]
+  },
+  {
+    "id": "R05",
+    "type": "related",
+    "question": "技术栈里提到了 Kafka 吗？",
+    "target_filename": "resume.text",
+    "expected_any": ["Kafka"]
+  },
+  {
+    "id": "R06",
+    "type": "related",
+    "question": "该候选人是否有微服务架构相关经验？",
+    "target_filename": "resume.text",
+    "expected_any": ["微服务"]
+  },
+  {
+    "id": "R07",
+    "type": "related",
+    "question": "高并发订单系统的 QPS 达到了多少？",
+    "target_filename": "resume.text",
+    "expected_any": ["10万", "10万+"]
+  },
+  {
+    "id": "R08",
+    "type": "related",
+    "question": "数据库优化后响应时间降到了多少？",
+    "target_filename": "resume.text",
+    "expected_any": ["50ms"]
+  },
+  {
+    "id": "R09",
+    "type": "related",
+    "question": "响应时间是从多少降到多少的？",
+    "target_filename": "resume.text",
+    "expected_all": ["500ms", "50ms"]
+  },
+  {
+    "id": "R10",
+    "type": "related",
+    "question": "这份简历的求职方向是什么？",
+    "target_filename": "resume.text",
+    "expected_any": ["Java 工程师", "Java工程师", "开发工程师"]
+  },
+
+  {
+    "id": "I01",
+    "type": "irrelevant",
+    "question": "今天北京天气怎么样？",
+    "target_filename": "resume.text"
+  },
+  {
+    "id": "I02",
+    "type": "irrelevant",
+    "question": "现在几点了？",
+    "target_filename": "resume.text"
+  },
+  {
+    "id": "I03",
+    "type": "irrelevant",
+    "question": "美国总统是谁？",
+    "target_filename": "resume.text"
+  },
+  {
+    "id": "I04",
+    "type": "irrelevant",
+    "question": "帮我写一首七言绝句",
+    "target_filename": "resume.text"
+  },
+  {
+    "id": "I05",
+    "type": "irrelevant",
+    "question": "推荐三家上海好吃的火锅店",
+    "target_filename": "resume.text"
+  },
+  {
+    "id": "I06",
+    "type": "irrelevant",
+    "question": "比特币今天多少钱？",
+    "target_filename": "resume.text"
+  },
+  {
+    "id": "I07",
+    "type": "irrelevant",
+    "question": "地球到月球大约多远？",
+    "target_filename": "resume.text"
+  },
+  {
+    "id": "I08",
+    "type": "irrelevant",
+    "question": "你会算 123 * 456 吗？",
+    "target_filename": "resume.text"
+  },
+  {
+    "id": "I09",
+    "type": "irrelevant",
+    "question": "请给我讲一下黑洞是什么",
+    "target_filename": "resume.text"
+  },
+  {
+    "id": "I10",
+    "type": "irrelevant",
+    "question": "帮我规划一趟去日本的旅游行程",
+    "target_filename": "resume.text"
+  },
+
+  {
+    "id": "M01",
+    "type": "meta",
+    "question": "你是谁",
+    "expected_contains": "我是小A"
+  },
+  {
+    "id": "M02",
+    "type": "meta",
+    "question": "你是谁呀",
+    "expected_contains": "我是小A"
+  },
+  {
+    "id": "M03",
+    "type": "meta",
+    "question": "你叫什么名字",
+    "expected_contains": "我是小A"
+  },
+  {
+    "id": "M04",
+    "type": "meta",
+    "question": "你叫什么名字啊",
+    "expected_contains": "我是小A"
+  },
+  {
+    "id": "M05",
+    "type": "meta",
+    "question": "你能做什么",
+    "expected_contains": "我是小A"
+  },
+  {
+    "id": "M06",
+    "type": "meta",
+    "question": "你能帮我做什么呀",
+    "expected_contains": "我是小A"
+  },
+  {
+    "id": "M07",
+    "type": "meta",
+    "question": "你有什么限制",
+    "expected_contains": "作为小A"
+  },
+  {
+    "id": "M08",
+    "type": "meta",
+    "question": "你不会什么",
+    "expected_contains": "作为小A"
+  },
+  {
+    "id": "M09",
+    "type": "meta",
+    "question": "你好，你是谁",
+    "expected_contains": "我是小A"
+  },
+  {
+    "id": "M10",
+    "type": "meta",
+    "question": "自我介绍一下吧",
+    "expected_contains": "我是小A"
+  }
+]

@@ -11,6 +11,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
 from rag_agent.core.document_loader import DocumentLoader
 from rag_agent.core.text_splitter import DocumentSplitter
 from rag_agent.core.tools import calculate, get_current_time, ToolRegistry, Tool
+from rag_agent.core.rag_chain import RAGChain
 
 
 class TestDocumentLoader:
@@ -112,6 +113,27 @@ class TestConfig:
         assert config.EMBEDDING_MODEL == "text-embedding-v1"
         assert config.CHUNK_SIZE == 600
         assert config.CHUNK_OVERLAP == 100
+
+
+class TestRAGChainGuards:
+    """测试 RAG 链的问题拦截逻辑"""
+
+    def test_identity_question_detected(self):
+        """测试身份问题识别"""
+        chain = RAGChain()
+        is_meta, meta_type = chain._is_meta_question("你是谁")
+        assert is_meta is True
+        assert meta_type == "identity"
+
+    def test_ambiguous_identity_statement_detected(self):
+        """测试“你是xxx”歧义句识别"""
+        chain = RAGChain()
+        assert chain._is_ambiguous_identity_statement("你是十一") is True
+
+    def test_exact_identity_not_ambiguous(self):
+        """测试明确身份问题不应判定为歧义句"""
+        chain = RAGChain()
+        assert chain._is_ambiguous_identity_statement("你是谁") is False
 
 
 if __name__ == "__main__":

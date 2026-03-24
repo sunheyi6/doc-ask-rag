@@ -1,0 +1,222 @@
+[
+  {
+    "id": "R01",
+    "type": "related",
+    "question": "Java 中 equals 和 == 的区别是什么？",
+    "target_filename": "docs.pdf",
+    "expected_any": [
+      "equals",
+      "=="
+    ]
+  },
+  {
+    "id": "R02",
+    "type": "related",
+    "question": "String 类型的 equals 方法和 hashcode 方法有什么关系？",
+    "target_filename": "docs.pdf",
+    "expected_any": [
+      "equals",
+      "hashcode"
+    ]
+  },
+  {
+    "id": "R03",
+    "type": "related",
+    "question": "Java 中 final 关键字的作用是什么？",
+    "target_filename": "docs.pdf",
+    "expected_any": [
+      "final",
+      "作用"
+    ]
+  },
+  {
+    "id": "R04",
+    "type": "related",
+    "question": "HashMap 和 HashTable 有什么主要区别？",
+    "target_filename": "docs.pdf",
+    "expected_any": [
+      "HashMap",
+      "HashTable"
+    ]
+  },
+  {
+    "id": "R05",
+    "type": "related",
+    "question": "Java 中 static 关键字的用途有哪些？",
+    "target_filename": "docs.pdf",
+    "expected_any": [
+      "static",
+      "用途"
+    ]
+  },
+  {
+    "id": "R06",
+    "type": "related",
+    "question": "HTTP 和 HTTPS 的主要区别是什么？",
+    "target_filename": "docs.pdf",
+    "expected_any": [
+      "HTTP",
+      "HTTPS"
+    ]
+  },
+  {
+    "id": "R07",
+    "type": "related",
+    "question": "TCP 和 UDP 的主要区别是什么？",
+    "target_filename": "docs.pdf",
+    "expected_any": [
+      "TCP",
+      "UDP"
+    ]
+  },
+  {
+    "id": "R08",
+    "type": "related",
+    "question": "Java 中 String 的 intern() 方法有什么作用？",
+    "target_filename": "docs.pdf",
+    "expected_any": [
+      "String",
+      "intern"
+    ]
+  },
+  {
+    "id": "R09",
+    "type": "related",
+    "question": "Java 中 byte 数据类型的取值范围是多少？",
+    "target_filename": "docs.pdf",
+    "expected_any": [
+      "byte",
+      "取值范围"
+    ]
+  },
+  {
+    "id": "R10",
+    "type": "related",
+    "question": "HashMap 和 HashSet 之间有什么联系？",
+    "target_filename": "docs.pdf",
+    "expected_any": [
+      "HashMap",
+      "HashSet"
+    ]
+  },
+  {
+    "id": "I01",
+    "type": "irrelevant",
+    "question": "今天北京天气怎么样？",
+    "target_filename": "docs.pdf"
+  },
+  {
+    "id": "I02",
+    "type": "irrelevant",
+    "question": "现在几点了？",
+    "target_filename": "docs.pdf"
+  },
+  {
+    "id": "I03",
+    "type": "irrelevant",
+    "question": "美国总统是谁？",
+    "target_filename": "docs.pdf"
+  },
+  {
+    "id": "I04",
+    "type": "irrelevant",
+    "question": "帮我写一首七言绝句",
+    "target_filename": "docs.pdf"
+  },
+  {
+    "id": "I05",
+    "type": "irrelevant",
+    "question": "推荐三家上海好吃的火锅店",
+    "target_filename": "docs.pdf"
+  },
+  {
+    "id": "I06",
+    "type": "irrelevant",
+    "question": "比特币今天多少钱？",
+    "target_filename": "docs.pdf"
+  },
+  {
+    "id": "I07",
+    "type": "irrelevant",
+    "question": "地球到月球大约多远？",
+    "target_filename": "docs.pdf"
+  },
+  {
+    "id": "I08",
+    "type": "irrelevant",
+    "question": "你会算 123 * 456 吗？",
+    "target_filename": "docs.pdf"
+  },
+  {
+    "id": "I09",
+    "type": "irrelevant",
+    "question": "请给我讲一下黑洞是什么",
+    "target_filename": "docs.pdf"
+  },
+  {
+    "id": "I10",
+    "type": "irrelevant",
+    "question": "帮我规划一趟去日本的旅游行程",
+    "target_filename": "docs.pdf"
+  },
+  {
+    "id": "M01",
+    "type": "meta",
+    "question": "你是谁",
+    "expected_contains": "我是小A"
+  },
+  {
+    "id": "M02",
+    "type": "meta",
+    "question": "你是谁呀",
+    "expected_contains": "我是小A"
+  },
+  {
+    "id": "M03",
+    "type": "meta",
+    "question": "你叫什么名字",
+    "expected_contains": "我是小A"
+  },
+  {
+    "id": "M04",
+    "type": "meta",
+    "question": "你叫什么名字啊",
+    "expected_contains": "我是小A"
+  },
+  {
+    "id": "M05",
+    "type": "meta",
+    "question": "你能做什么",
+    "expected_contains": "我是小A"
+  },
+  {
+    "id": "M06",
+    "type": "meta",
+    "question": "你能帮我做什么呀",
+    "expected_contains": "我是小A"
+  },
+  {
+    "id": "M07",
+    "type": "meta",
+    "question": "你有什么限制",
+    "expected_contains": "作为小A"
+  },
+  {
+    "id": "M08",
+    "type": "meta",
+    "question": "你不会什么",
+    "expected_contains": "作为小A"
+  },
+  {
+    "id": "M09",
+    "type": "meta",
+    "question": "你好，你是谁",
+    "expected_contains": "我是小A"
+  },
+  {
+    "id": "M10",
+    "type": "meta",
+    "question": "自我介绍一下吧",
+    "expected_contains": "我是小A"
+  }
+]

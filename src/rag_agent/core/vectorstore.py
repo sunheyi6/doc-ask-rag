@@ -64,7 +64,8 @@ class VectorStore:
         self, 
         query: str, 
         k: int = None,
-        score_threshold: float = None
+        score_threshold: float = None,
+        metadata_filter: Optional[dict] = None
     ) -> List[Tuple[Document, float]]:
         """
         相似度搜索
@@ -83,7 +84,11 @@ class VectorStore:
         k = k or config.RETRIEVAL_TOP_K
         
         # 使用相似度搜索 with score
-        docs_with_scores = self._vectorstore.similarity_search_with_score(query, k=k)
+        docs_with_scores = self._vectorstore.similarity_search_with_score(
+            query,
+            k=k,
+            filter=metadata_filter
+        )
         
         # 过滤低于阈值的
         if score_threshold is not None:
@@ -98,7 +103,8 @@ class VectorStore:
         self, 
         query: str, 
         top_k: int = 3,
-        score_threshold: float = None
+        score_threshold: float = None,
+        metadata_filter: Optional[dict] = None
     ) -> str:
         """
         获取相关上下文文本（用于 RAG）
@@ -111,7 +117,11 @@ class VectorStore:
         Returns:
             合并的上下文文本
         """
-        docs_with_scores = self.similarity_search(query, k=top_k * 2)
+        docs_with_scores = self.similarity_search(
+            query,
+            k=top_k * 2,
+            metadata_filter=metadata_filter
+        )
         
         threshold = score_threshold or config.SIMILARITY_THRESHOLD
         

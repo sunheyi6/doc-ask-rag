@@ -63,6 +63,36 @@ class RAGChain:
 - 不会编造信息
 
 如果您需要我处理文档之外的内容，建议先上传相关资料！"""
+
+    @staticmethod
+    def _normalize_text(text: str) -> str:
+        """标准化文本，便于做稳健匹配"""
+        return re.sub(r"\s+", "", (text or "").strip().lower())
+
+    @staticmethod
+    def _normalize_question_for_match(question: str) -> str:
+        """标准化问句：去空白、统一标点、去末尾语气助词，提升口语问法命中率"""
+        q = (question or "").strip().lower()
+        q = re.sub(r"\s+", "", q)
+        q = q.replace("？", "?").replace("！", "!").replace("。", ".")
+        q = re.sub(r"[?!.]+$", "", q)
+        q = re.sub(r"[呀啊呢嘛吧哈哦噢]+$", "", q)
+        q = re.sub(r"[?!.]+$", "", q)
+        return q
+
+    def _is_meta_answer_text(self, answer: str) -> bool:
+        """兜底判断回答文本是否属于助手身份/能力/限制类回答"""
+        answer_norm = self._normalize_text(answer)
+        identity_norm = self._normalize_text(self.IDENTITY_ANSWER)
+        capability_norm = self._normalize_text(self.CAPABILITY_ANSWER)
+        limitation_norm = self._normalize_text(self.LIMITATION_ANSWER)
+
+        return (
+            answer_norm == identity_norm
+            or answer_norm == capability_norm
+            or answer_norm == limitation_norm
+            or answer_norm.startswith(self._normalize_text("我是小A，您的个人知识库助手"))
+        )
     
     def _is_math_question(self, question: str) -> bool:
         """检测是否为简单数学问题"""
@@ -77,7 +107,7 @@ class RAGChain:
         Returns:
             (是否是元问题, 回答类型: 'identity' 或 'capability')
         """
-        question_clean = question.strip().lower().replace(" ", "").replace("？", "?")
+        question_clean = self._normalize_question_for_match(question)
         
         # 身份/问候类
         identity_patterns = [
@@ -133,10 +163,27 @@ class RAGChain:
                 return True, "limitation"
         
         return False, ""
+
+    def _is_ambiguous_identity_statement(self, question: str) -> bool:
+        """
+        检测易误判的身份陈述句（如“你是十一”）。
+        这类输入经常被模型误解为“你是谁”，因此优先按无关问题处理。
+        """
+        question_clean = self._normalize_question_for_match(question)
+        if not question_clean.startswith("你是"):
+            return False
+
+        # 明确的元问题不在此分支处理
+        is_meta, _ = self._is_meta_question(question_clean)
+        if is_meta:
+            return False
+
+        # 限制在简短陈述句，避免误伤正常的文档问题
+        return bool(re.match(r"^你是[\u4e00-\u9fff0-9a-z]{1,8}\??$", question_clean))
     
     def _is_common_sense_question(self, question: str) -> bool:
         """检测是否为常识性问题（时间、天气、地理位置等）"""
-        question_clean = question.strip().lower().replace(" ", "").replace("？", "?")
+        question_clean = self._normalize_question_for_match(question)
         
         # 时间相关
         time_patterns = [
@@ -163,7 +210,7 @@ class RAGChain:
                 return True
         return False
     
-    def _check_relevance(self, question: str) -> tuple[bool, str]:
+    def _check_relevance(self, question: str, target_filename: Optional[str] = None) -> tuple[bool, str]:
         """
         检查问题是否与文档相关
         
@@ -177,12 +224,19 @@ class RAGChain:
         # 简单数学问题直接判定为不相关
         if self._is_math_question(question) and len(question.strip()) < 20:
             return False, ""
+
+        # 避免“你是xxx”被误判成身份问候并触发自我介绍
+        if self._is_ambiguous_identity_statement(question):
+            return False, ""
         
+        metadata_filter = {"filename": target_filename} if target_filename else None
+
         # 获取相关上下文
         context = self.vectorstore.get_relevant_context(
             question,
             top_k=3,
-            score_threshold=config.SIMILARITY_THRESHOLD
+            score_threshold=config.SIMILARITY_THRESHOLD,
+            metadata_filter=metadata_filter
         )
         
         # 如果获取不到上下文，判定为不相关
@@ -191,7 +245,7 @@ class RAGChain:
         
         return True, context
     
-    def invoke(self, question: str, chat_history: str = "") -> RAGResponse:
+    def invoke(self, question: str, chat_history: str = "", target_filename: Optional[str] = None) -> RAGResponse:
         """
         执行 RAG 问答（同步）
         
@@ -219,7 +273,7 @@ class RAGChain:
             )
         
         # 检查相关性
-        is_relevant, context = self._check_relevance(question)
+        is_relevant, context = self._check_relevance(question, target_filename=target_filename)
         
         if not is_relevant:
             return RAGResponse(
@@ -234,9 +288,18 @@ class RAGChain:
         
         # 调用 LLM
         answer = self.llm.invoke(prompt)
+
+        # 兜底：若模型输出的是助手身份/能力/限制类回答，不展示引用来源
+        if self._is_meta_answer_text(answer):
+            return RAGResponse(
+                answer=answer,
+                sources=[],
+                is_relevant=True,
+                is_identity_question=True
+            )
         
         # 获取来源信息
-        sources = self._get_sources(question)
+        sources = self._get_sources(question, target_filename=target_filename)
         
         return RAGResponse(
             answer=answer,
@@ -244,7 +307,7 @@ class RAGChain:
             is_relevant=True
         )
     
-    def stream(self, question: str, chat_history: str = "") -> Iterator[str]:
+    def stream(self, question: str, chat_history: str = "", target_filename: Optional[str] = None) -> Iterator[str]:
         """
         流式执行 RAG 问答
         
@@ -268,7 +331,7 @@ class RAGChain:
             return
         
         # 检查相关性
-        is_relevant, context = self._check_relevance(question)
+        is_relevant, context = self._check_relevance(question, target_filename=target_filename)
         
         if not is_relevant:
             yield "您提问的问题与文档无关，请提问与文档相关问题"
@@ -281,9 +344,14 @@ class RAGChain:
         for chunk in self.llm.stream(prompt):
             yield chunk
     
-    def _get_sources(self, question: str, k: int = 3) -> List[Dict[str, Any]]:
+    def _get_sources(self, question: str, k: int = 3, target_filename: Optional[str] = None) -> List[Dict[str, Any]]:
         """获取引用来源"""
-        docs_with_scores = self.vectorstore.similarity_search(question, k=k)
+        metadata_filter = {"filename": target_filename} if target_filename else None
+        docs_with_scores = self.vectorstore.similarity_search(
+            question,
+            k=k,
+            metadata_filter=metadata_filter
+        )
         
         sources = []
         for doc, score in docs_with_scores[:k]:

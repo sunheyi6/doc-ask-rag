@@ -1,167 +1,156 @@
-# 📄 智能文档问答系统
+# 📚 个人知识库问答系统（Doc Ask RAG）
 
 [![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://www.python.org/)
 [![Streamlit](https://img.shields.io/badge/Streamlit-1.50+-red.svg)](https://streamlit.io/)
 [![LangChain](https://img.shields.io/badge/LangChain-0.3+-green.svg)](https://langchain.com/)
 
-> 🤖 基于 RAG（检索增强生成）技术的个人知识库助手，支持文档问答、引用溯源、流式输出
+基于 RAG（检索增强生成）的个人知识库系统，支持多会话问答、共享知识库、多文档上传、单文件检索约束、引用溯源与自动化评测。
 
-## ✨ 核心特性
+## ✨ 当前能力
 
-- 📚 **多格式支持** - PDF、TXT、DOCX 文档一键上传
-- 🔍 **智能检索** - 基于向量相似度的语义检索
-- 💬 **流式对话** - 实时打字机效果输出
-- 📖 **引用溯源** - 显示回答来源段落
-- 🛡️ **无关问题拦截** - 智能识别与文档无关的问题
-- 🧠 **多轮对话** - 支持上下文理解的连续对话
+- 多格式上传：`PDF / TXT / DOCX`
+- 多会话管理：左侧会话页签，当前会话高亮
+- 共享知识库：上传文档在所有会话中共享
+- 单文件检索：可指定“当前检索文件”
+- 流式输出：打字机效果
+- 引用来源展示：按文件去重，仅显示`来源序号 | 文件名 | 相关度`
+- 无关问题拦截：对常识类/非文档问题进行拒答
+- 元问题识别：支持口语问法（如“你是谁呀”）
+- 系统状态问答：支持“我上传了什么文件”等非检索型系统问题
+- 自动化评测：支持生成评测集并输出 benchmark 报告
+
+## 🧱 项目结构
+
+```text
+doc-ask-rag/
+├── src/rag_agent/
+│   ├── core/
+│   │   ├── document_loader.py
+│   │   ├── text_splitter.py
+│   │   ├── embeddings.py
+│   │   ├── vectorstore.py
+│   │   ├── llm.py
+│   │   └── rag_chain.py
+│   ├── web/
+│   │   └── app.py
+│   ├── api/
+│   └── utils/
+├── scripts/
+│   ├── run_web.py
+│   ├── run_api.py
+│   ├── evaluate_rag.py
+│   └── generate_eval_dataset.py
+├── docs/
+│   ├── EVALUATION.md
+│   ├── benchmark.md
+│   ├── benchmark_real.md
+│   └── eval_dataset_*.json
+├── tests/
+├── uploaded_docs/
+├── requirements.txt
+└── AGENTS.md
+```
 
 ## 🚀 快速开始
 
-### 环境要求
-
-- Python 3.10+
-- 阿里云 DashScope API Key
-
-### 安装
+### 1) 安装依赖
 
 ```bash
-# 克隆项目
-git clone <your-repo-url>
-cd doc-ask-rag
-
-# 创建虚拟环境
+# Windows
 python -m venv venv
-
-# 激活虚拟环境
-# Windows:
-venv\Scripts\activate
-# macOS/Linux:
-source venv/bin/activate
-
-# 安装依赖
-pip install -r requirements.txt
+venv\Scripts\python -m pip install -r requirements.txt
 ```
 
-### 配置
+### 2) 配置环境变量
 
-创建 `.env` 文件：
+创建 `.env` 文件（可参考 `.env.example`）：
 
 ```bash
-# 复制模板
-cp .env.example .env
-
-# 编辑 .env 文件，填入你的 API Key
-DASHSCOPE_API_KEY=sk-your-api-key-here
+DASHSCOPE_API_KEY=sk-xxxxxxxxxxxxxxxx
 ```
 
-### 运行
+### 3) 启动 Web（推荐）
 
 ```bash
-# 方式1：直接运行
-python -m streamlit run src/rag_agent/web/app.py
-
-# 方式2：使用脚本
-python scripts/run_web.py
+# 按项目规范启动（默认端口 8501）
+venv\Scripts\python scripts/run_web.py
 ```
 
-访问 http://localhost:8501
+访问：[http://localhost:8501](http://localhost:8501)
 
-## 📸 功能演示
+## 🧭 使用说明
 
-### 文档上传与问答
+1. 上传一个或多个文档（构建共享知识库）
+2. 在左侧切换/新建会话（会话只隔离聊天历史，不隔离知识库）
+3. 在左侧设置中选择：
+   - 是否显示引用来源
+   - 当前检索文件（限制回答只基于该文件）
+4. 输入问题并查看流式回答
 
-1. 在侧边栏上传文档（PDF/TXT/DOCX）
-2. 系统自动解析、分块、建立向量索引
-3. 在对话框中输入问题
-4. 查看带有引用来源的回答
+## 📊 自动化评测
 
-### 引用溯源
-
-每个回答都可以展开查看引用来源，显示相关段落和相似度分数。
-
-## 🏗️ 架构设计
-
-```
-doc-ask-rag/
-├── src/rag_agent/          # 核心源码
-│   ├── core/               # 核心模块
-│   │   ├── document_loader.py    # 文档加载
-│   │   ├── text_splitter.py      # 文本分块
-│   │   ├── embeddings.py         # Embedding 服务
-│   │   ├── vectorstore.py        # 向量数据库
-│   │   ├── llm.py                # 大模型封装
-│   │   └── rag_chain.py          # RAG 流程
-│   ├── api/                # API 接口（待实现）
-│   ├── web/                # Web 界面
-│   │   └── app.py          # Streamlit 应用
-│   └── utils/              # 工具函数
-├── tests/                  # 测试
-├── docs/                   # 文档
-├── scripts/                # 脚本
-├── requirements.txt        # 依赖
-└── README.md               # 本文件
-```
-
-## 🔧 技术栈
-
-| 组件 | 技术 |
-|------|------|
-| Web 框架 | Streamlit |
-| RAG 框架 | LangChain |
-| 向量数据库 | ChromaDB |
-| 大语言模型 | 阿里云通义千问 |
-| Embedding | DashScope text-embedding-v1 |
-| 文档解析 | PyPDF2, python-docx |
-
-## 📖 进阶配置
-
-### 环境变量
+### 1) 用现有评测集执行评测
 
 ```bash
-# 模型配置
-LLM_MODEL=qwen-turbo              # 大模型
-EMBEDDING_MODEL=text-embedding-v1 # Embedding 模型
+venv\Scripts\python scripts/evaluate_rag.py ^
+  --docs uploaded_docs/resume.pdf ^
+  --dataset docs/eval_dataset_resume_30.json ^
+  --output docs/benchmark.md
+```
+
+### 2) 基于真实文档自动生成评测集（30条）
+
+```bash
+venv\Scripts\python scripts/generate_eval_dataset.py ^
+  --docs "uploaded_docs/阿里巴巴Java开发手册(终极版).pdf" ^
+  --output docs/eval_dataset_java_spec_30.json
+```
+
+### 3) 对生成的评测集执行评测
+
+```bash
+venv\Scripts\python scripts/evaluate_rag.py ^
+  --docs "uploaded_docs/阿里巴巴Java开发手册(终极版).pdf" ^
+  --dataset docs/eval_dataset_java_spec_30.json ^
+  --output docs/benchmark_java_spec.md
+```
+
+评测指标定义见：[EVALUATION.md](./docs/EVALUATION.md)
+
+## 🔧 关键配置
+
+```bash
+# 模型
+LLM_MODEL=qwen-turbo
+EMBEDDING_MODEL=text-embedding-v1
+
+# 检索
+RETRIEVAL_TOP_K=5
+SIMILARITY_THRESHOLD=1.8
 
 # 文本分块
-CHUNK_SIZE=600                    # 分块大小
-CHUNK_OVERLAP=100                 # 重叠大小
+CHUNK_SIZE=600
+CHUNK_OVERLAP=100
 
-# 检索配置
-RETRIEVAL_TOP_K=5                 # 检索结果数量
-SIMILARITY_THRESHOLD=1.8          # 相似度阈值
-
-# 路径配置
-CHROMA_PERSIST_DIR=./chroma_db    # 向量库存储路径
-UPLOAD_DIR=./uploaded_docs        # 上传文件路径
+# 路径
+CHROMA_PERSIST_DIR=./chroma_db
+CHROMA_TEMP_DIR=./chroma_db_temp
+UPLOAD_DIR=./uploaded_docs
 ```
 
-## 🛣️ 路线图
+## 🧪 测试
 
-### 阶段 1：基础完善 ✅
-- [x] 项目结构重构
-- [x] 流式输出
-- [x] 引用溯源
-- [ ] README 完善
+```bash
+venv\Scripts\python -m pytest -q
+```
 
-### 阶段 2：Agent 能力 🚧
-- [ ] FastAPI 后端
-- [ ] ReAct Agent 架构
-- [ ] 工具调用（计算、搜索）
-- [ ] 多文档管理
+## 📌 开发约定
 
-### 阶段 3：工程化
-- [ ] Docker 部署
-- [ ] 测试覆盖
-- [ ] 线上部署
-
-## 🤝 贡献
-
-欢迎提交 Issue 和 PR！
+- 启动优先使用：`venv\Scripts\python scripts/run_web.py`
+- 默认端口：`8501`
+- 重启服务必须先关闭旧进程再启动新进程
+- 项目级协作约束统一维护在 [AGENTS.md](./AGENTS.md)
 
 ## 📄 License
 
-MIT License
-
----
-
-> 💡 提示：本项目使用阿里云 DashScope 服务，请确保你的账户有足够的额度。
+MIT
