@@ -16,6 +16,7 @@ class RAGResponse:
     answer: str
     sources: List[Dict[str, Any]]  # 引用来源
     is_relevant: bool  # 是否与文档相关
+    is_identity_question: bool = False  # 是否是身份问候类问题
     
 
 class RAGChain:
@@ -25,11 +26,142 @@ class RAGChain:
         self.vectorstore = vectorstore or VectorStore()
         self.llm = LLM()
     
+    # 预设回答
+    IDENTITY_ANSWER = "我是小A，您的个人知识库助手，我可以根据您上传的文档为您解答问题。"
+    
+    CAPABILITY_ANSWER = """我是小A，您的个人知识库助手。我可以帮您：
+
+📄 **文档问答**
+- 上传 PDF、TXT、DOCX 格式的文档
+- 针对文档内容回答您的问题
+- 显示回答的引用来源
+
+💡 **智能功能**
+- 理解文档语义，不只是关键词匹配
+- 自动判断问题是否与文档相关
+- 支持连续多轮对话
+
+📝 **支持的操作**
+- 在左侧边栏上传文档
+- 直接输入问题提问
+- 查看"查看引用来源"了解回答依据
+
+有什么关于您上传文档的问题，随时问我！"""
+    
+    LIMITATION_ANSWER = """作为小A，我有一些限制：
+
+🚫 **我不能做的**
+- 回答与上传文档无关的问题
+- 访问互联网获取实时信息（除非使用搜索工具）
+- 执行复杂的数学计算（但我可以调用计算工具）
+- 记住跨会话的信息
+- 处理图像、音频、视频内容（暂不支持）
+
+✅ **我的设计原则**
+- 只基于您上传的文档回答
+- 不确定时会告知您
+- 不会编造信息
+
+如果您需要我处理文档之外的内容，建议先上传相关资料！"""
+    
     def _is_math_question(self, question: str) -> bool:
         """检测是否为简单数学问题"""
         # 检测数学表达式如 "1+1", "2*3" 等
         pattern = r'^\s*\d+\s*[+\-*/]\s*\d+\s*$'
         return bool(re.match(pattern, question.strip()))
+    
+    def _is_meta_question(self, question: str) -> tuple[bool, str]:
+        """
+        检测是否为关于助手自身的元问题（身份、能力等）
+        
+        Returns:
+            (是否是元问题, 回答类型: 'identity' 或 'capability')
+        """
+        question_clean = question.strip().lower().replace(" ", "").replace("？", "?")
+        
+        # 身份/问候类
+        identity_patterns = [
+            r'^你是谁\??$',
+            r'^你叫什么名字\??$',
+            r'^你是什么\??$',
+            r'^你好,?你是谁\??$',
+            r'^自我介绍[一下]?[吧]?\??$',
+            r'^hi,?你是谁\??$',
+            r'^hello,?你是谁\??$',
+            r'^你是[谁小]a\??$',
+        ]
+        
+        # 能力/功能类（正向）
+        capability_patterns = [
+            r'^你能做什么\??$',
+            r'^你会什么\??$',
+            r'^你有什么功能\??$',
+            r'^你可以做什么\??$',
+            r'^你怎么用\??$',
+            r'^你怎么使用\??$',
+            r'^你有什么用\??$',
+            r'^你是干什么的\??$',
+            r'^你的作用是什么\??$',
+            r'^你能帮我做什么\??$',
+            r'^你能[做干]啥\??$',
+            r'^你有啥功能\??$',
+            r'^你[做干]啥[用的]\??$',
+        ]
+        
+        # 能力/限制类（反向）
+        limitation_patterns = [
+            r'^你不能做什么\??$',
+            r'^你不会什么\??$',
+            r'^你有什么限制\??$',
+            r'^你有什么局限\??$',
+            r'^你不能[做干]啥\??$',
+            r'^你[做干]不了什么\??$',
+            r'^你的限制是什么\??$',
+            r'^你不能帮我做什么\??$',
+        ]
+        
+        for pattern in identity_patterns:
+            if re.match(pattern, question_clean):
+                return True, "identity"
+        
+        for pattern in capability_patterns:
+            if re.match(pattern, question_clean):
+                return True, "capability"
+        
+        for pattern in limitation_patterns:
+            if re.match(pattern, question_clean):
+                return True, "limitation"
+        
+        return False, ""
+    
+    def _is_common_sense_question(self, question: str) -> bool:
+        """检测是否为常识性问题（时间、天气、地理位置等）"""
+        question_clean = question.strip().lower().replace(" ", "").replace("？", "?")
+        
+        # 时间相关
+        time_patterns = [
+            r'^(现在|目前|当前)?(几点|几|什么时间|什么时候|时间)[了]?\??$',
+            r'^(今天|明天|昨天|现在)是?(几号|日期|星期几)[了]?\??$',
+            r'^(现在|当前)?((什么|哪个)年|年份)[了]?\??$',
+        ]
+        
+        # 天气相关
+        weather_patterns = [
+            r'^(今天|明天|现在)(天气|气温|温度)(怎么样|如何|多少)?\??$',
+            r'^(今天|明天)(下雨|下雪|晴天|阴天)吗\??$',
+        ]
+        
+        # 地理位置相关
+        location_patterns = [
+            r'^((我在|这是|这里是))?(哪里|什么地方|哪个城市|哪个国家)\??$',
+        ]
+        
+        all_patterns = time_patterns + weather_patterns + location_patterns
+        
+        for pattern in all_patterns:
+            if re.search(pattern, question_clean):
+                return True
+        return False
     
     def _check_relevance(self, question: str) -> tuple[bool, str]:
         """
@@ -38,6 +170,10 @@ class RAGChain:
         Returns:
             (is_relevant, context)
         """
+        # 常识性问题直接判定为不相关（不需要查文档）
+        if self._is_common_sense_question(question):
+            return False, ""
+        
         # 简单数学问题直接判定为不相关
         if self._is_math_question(question) and len(question.strip()) < 20:
             return False, ""
@@ -66,6 +202,22 @@ class RAGChain:
         Returns:
             RAGResponse 包含答案和引用
         """
+        # 检测元问题（关于助手自身的问题），直接返回预设回答，不检索文档
+        is_meta, meta_type = self._is_meta_question(question)
+        if is_meta:
+            if meta_type == "identity":
+                answer = self.IDENTITY_ANSWER
+            elif meta_type == "limitation":
+                answer = self.LIMITATION_ANSWER
+            else:
+                answer = self.CAPABILITY_ANSWER
+            return RAGResponse(
+                answer=answer,
+                sources=[],  # 元问题不显示引用
+                is_relevant=True,
+                is_identity_question=True
+            )
+        
         # 检查相关性
         is_relevant, context = self._check_relevance(question)
         
@@ -73,7 +225,8 @@ class RAGChain:
             return RAGResponse(
                 answer="您提问的问题与文档无关，请提问与文档相关问题",
                 sources=[],
-                is_relevant=False
+                is_relevant=False,
+                is_identity_question=True  # 标记为 True 以避免显示引用来源
             )
         
         # 构建提示词
@@ -102,6 +255,18 @@ class RAGChain:
         Yields:
             生成的文本片段
         """
+        # 检测元问题，直接返回预设回答
+        is_meta, meta_type = self._is_meta_question(question)
+        if is_meta:
+            if meta_type == "identity":
+                answer = self.IDENTITY_ANSWER
+            elif meta_type == "limitation":
+                answer = self.LIMITATION_ANSWER
+            else:
+                answer = self.CAPABILITY_ANSWER
+            yield answer
+            return
+        
         # 检查相关性
         is_relevant, context = self._check_relevance(question)
         

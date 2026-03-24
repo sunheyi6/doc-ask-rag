@@ -23,8 +23,8 @@ def main():
         "--server.headless=true"
     ]
     
-    print("🚀 启动智能文档问答系统...")
-    print("📍 访问地址: http://localhost:8501")
+    print("[启动] 智能文档问答系统...")
+    print("[地址] http://localhost:8501")
     print("\n按 Ctrl+C 停止服务\n")
     
     try:

@@ -4,6 +4,7 @@ Streamlit Web 应用 - 智能文档问答系统（重构版）
 """
 import sys
 import os
+import time
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 
 import streamlit as st
@@ -17,6 +18,13 @@ from rag_agent.core import (
     VectorStore,
     RAGChain
 )
+from rag_agent.utils.logger import conversation_logger
+
+# 生成或获取会话ID
+if "session_id" not in st.session_state:
+    import uuid
+    st.session_state.session_id = str(uuid.uuid4())
+    conversation_logger.logger.info(f"新会话启动: {st.session_state.session_id}")
 
 # ========== 页面配置 ==========
 st.set_page_config(
@@ -125,10 +133,18 @@ if uploaded_file is not None:
                 st.session_state.current_file = uploaded_file.name
                 st.session_state.messages = []
                 
+                # 记录文档上传日志
+                conversation_logger.log_document_upload(
+                    session_id=st.session_state.session_id,
+                    filename=uploaded_file.name,
+                    chunk_count=len(splits)
+                )
+                
                 st.success("🎉 文档处理完成，可以开始提问！")
                 
             except Exception as e:
                 st.error(f"❌ 处理失败：{str(e)}")
+                conversation_logger.log_error(e, f"文档上传失败 - 会话: {st.session_state.session_id}")
                 st.stop()
 
 # 聊天界面
@@ -139,8 +155,10 @@ for msg in st.session_state.messages:
     with st.chat_message(msg["role"]):
         st.write(msg["content"])
         
-        # 显示引用来源
-        if msg["role"] == "assistant" and st.session_state.show_sources and "sources" in msg:
+        # 显示引用来源（身份问题不显示，空来源也不显示）
+        is_identity = msg.get("is_identity_question", False)
+        has_sources = msg.get("sources") and len(msg["sources"]) > 0
+        if msg["role"] == "assistant" and st.session_state.show_sources and has_sources and not is_identity:
             with st.expander("📚 查看引用来源"):
                 for i, source in enumerate(msg["sources"], 1):
                     st.markdown(f"**来源 {i}** (相关度: {source['score']})")
@@ -165,34 +183,59 @@ else:
         with st.chat_message("assistant"):
             message_placeholder = st.empty()
             full_response = ""
+            start_time = time.time()
             
             # 流式生成
             with st.spinner("思考中..."):
                 try:
-                    # 先检查是否相关（非流式）
+                    # 先调用一次获取响应类型和来源（不重复调用 LLM 生成）
                     response = st.session_state.rag_chain.invoke(prompt)
                     
                     if not response.is_relevant:
+                        # 不相关问题，直接显示，不显示引用来源
                         full_response = response.answer
                         message_placeholder.write(full_response)
                         sources = []
+                        is_identity = True  # 设为 True 以避免显示引用来源
+                    elif response.is_identity_question:
+                        # 元问题（身份/能力），直接显示，不流式
+                        full_response = response.answer
+                        message_placeholder.write(full_response)
+                        sources = []
+                        is_identity = True
                     else:
-                        # 流式输出
+                        # 文档相关问题，流式输出
                         full_response = ""
                         for chunk in st.session_state.rag_chain.stream(prompt):
                             full_response += chunk
                             message_placeholder.write(full_response + "▌")
                         message_placeholder.write(full_response)
                         
-                        # 获取引用来源
+                        # 使用 invoke 获取的来源（避免 stream 重复检索）
                         sources = response.sources
+                        is_identity = False
+                    
+                    # 计算响应时间
+                    response_time = time.time() - start_time
+                    
+                    # 记录对话日志
+                    conversation_logger.log_conversation(
+                        session_id=st.session_state.session_id,
+                        user_message=prompt,
+                        ai_response=full_response,
+                        sources=sources,
+                        is_relevant=response.is_relevant,
+                        response_time=response_time
+                    )
                     
                     # 保存到历史
                     st.session_state.messages.append({
                         "role": "assistant",
                         "content": full_response,
-                        "sources": sources
+                        "sources": sources,
+                        "is_identity_question": is_identity
                     })
                     
                 except Exception as e:
                     st.error(f"❌ 生成失败：{str(e)}")
+                    conversation_logger.log_error(e, f"对话生成失败 - 会话: {st.session_state.session_id}")

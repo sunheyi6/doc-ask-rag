@@ -28,7 +28,7 @@ class DashScopeEmbeddings(Embeddings):
                 input=text
             )
             if response.status_code == 200:
-                responses.append(response.output['embeddings'][0]['encoding'])
+                responses.append(response.output['embeddings'][0]['embedding'])
             else:
                 raise RuntimeError(f"Embedding failed: {response.message}")
         return responses

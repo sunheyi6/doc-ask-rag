@@ -48,7 +48,7 @@ class LLM:
             **kwargs: 其他参数
             
         Yields:
-            生成的文本片段
+            生成的文本片段（增量）
         """
         messages = [{"role": "user", "content": prompt}]
         
@@ -60,11 +60,16 @@ class LLM:
             **kwargs
         )
         
+        previous_text = ""
         for response in responses:
             if response.status_code == 200:
-                chunk = response.output.choices[0].message.content
-                if chunk:
-                    yield chunk
+                current_text = response.output.choices[0].message.content
+                if current_text:
+                    # 计算增量（delta）
+                    delta = current_text[len(previous_text):]
+                    if delta:
+                        yield delta
+                    previous_text = current_text
             else:
                 raise RuntimeError(f"LLM 流式调用失败: {response.message}")
 
