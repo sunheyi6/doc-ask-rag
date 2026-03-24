@@ -21,6 +21,8 @@ chroma_db_temp/
 Thumbs.db
 
 uploaded_docs/
+data/
+logs/
 *.pdf
 *.txt
 *.docx
