@@ -151,8 +151,8 @@ else:
                         response = "您提问的问题与文档无关，请提问与文档相关问题"
                         st.write(response)
                     else:
-                        # === 执行检索（取 top 3，选最相关的一个）===
-                        docs_with_scores = st.session_state.vectorstore.similarity_search_with_score(prompt, k=3)
+                        # === 执行检索（取 top 5，选最相关的一个）===
+                        docs_with_scores = st.session_state.vectorstore.similarity_search_with_score(prompt, k=5)
                         
                         if not docs_with_scores:
                             response = "您提问的问题与文档无关，请提问与文档相关问题"
@@ -161,26 +161,39 @@ else:
                             # 取距离最小（最相关）的结果
                             best_doc, best_score = min(docs_with_scores, key=lambda x: x[1])
                             
-                            # 显示调试信息
-                            st.write(f"🔍 相似度 (越小越相关，0~2): {best_score:.3f}")
-                            st.text(f"相关段落: {best_doc.page_content[:300]}...")
+                            # 调试信息（不显示在界面上）
+                            # st.write(f"🔍 相似度 (越小越相关，0~2): {best_score:.3f}")
+                            # st.text(f"相关段落: {best_doc.page_content[:300]}...")
 
-                            # ✅ 放宽阈值：> 1.5 才认为不相关
-                            if best_score > 1.5:
+                            # ✅ 放宽阈值：> 1.8 才认为不相关（余弦距离，越小越相似）
+                            if best_score > 1.8:
                                 response = "您提问的问题与文档无关，请提问与文档相关问题"
                                 st.write(response)
                             else:
                                 # 调用 LLM 回答
                                 llm = Tongyi(model="qwen-turbo", dashscope_api_key=api_key)
-                                final_prompt = f"""请根据以下上下文回答问题。如果上下文没有相关信息，请回答"您提问的问题与文档无关，请提问与文档相关问题"。不要编造。
+                                # 合并多个相关段落，提供更丰富的上下文
+                                all_contexts = "\n\n---\n\n".join([doc.page_content for doc, score in docs_with_scores if score <= 1.8][:3])
+                                
+                                final_prompt = f"""你是小A，用户的个人知识库助手。你的任务是根据上传的文档内容回答用户问题。
 
-上下文：
-{best_doc.page_content}
+角色设定：
+- 你的名字是小A
+- 你是用户的专属知识库助手
+- 当用户问"你是谁"时，请回答："我是小A，您的个人知识库助手，我可以根据您上传的文档为您解答问题。"
 
-问题：
+回答规则：
+1. 如果上下文中包含相关信息，请基于文档内容直接回答
+2. 只有当上下文完全没有相关信息时，才回答"您提问的问题与文档无关，请提问与文档相关问题"
+3. 不要编造信息
+
+文档上下文：
+{all_contexts}
+
+用户问题：
 {prompt}
 
-回答："""
+请回答："""
                                 response = llm.invoke(final_prompt)
                                 st.write(response)
 
