@@ -36,6 +36,7 @@ doc-ask-rag/
 ├── src/rag_agent/          # 核心源码
 │   ├── __init__.py
 │   ├── config.py           # 集中配置管理
+│   ├── data/sample_docs/   # 内置示例文档（首次启动自动导入知识库）
 │   ├── core/               # 核心模块
 │   │   ├── __init__.py
 │   │   ├── agent.py        # ReAct Agent 实现

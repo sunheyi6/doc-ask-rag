@@ -1,0 +1,43 @@
+ETQ 系统部署手册
+================
+
+一、部署环境要求
+---------------
+ETQ 系统部署前需要准备以下环境：
+1. 操作系统：CentOS 7.9 或 Ubuntu 20.04 LTS（64 位）
+2. Java 运行时：JDK 17（ETQ 要求最低 Java 17，低于此版本无法启动）
+3. 数据库：MySQL 8.0（需提前创建 etq 数据库并设置 utf8mb4 字符集）
+4. 中间件：Redis 6.2（用于会话缓存），RabbitMQ（用于异步任务）
+
+二、Docker 部署方式（推荐）
+--------------------------
+ETQ 提供完整的 Docker 镜像，部署命令如下：
+
+1. 拉取镜像并启动：
+   docker pull registry.etq.example.com/etq-server:2.4.1
+   docker run -d --name etq-server \
+     -p 8080:8080 \
+     -e MYSQL_HOST=127.0.0.1 \
+     -e MYSQL_PORT=3306 \
+     -e MYSQL_DATABASE=etq \
+     -e JVM_OPTS="-Xms2g -Xmx4g" \
+     registry.etq.example.com/etq-server:2.4.1
+
+2. 验证启动：访问 http://localhost:8080/actuator/health
+   返回 {"status":"UP"} 表示 ETQ 启动成功。
+
+三、配置文件说明
+--------------
+ETQ 的配置文件位于 /opt/etq/conf/application.yml，关键配置项如下：
+- server.port：服务端口，默认 8080
+- etq.storage.path：附件存储路径，默认 /data/etq/storage
+- etq.llm.model：问答模型名称，默认 qwen-turbo，可改为 qwen-plus 提升回答质量
+- etq.llm.api-key：调用阿里云通义千问的 API Key
+
+修改配置后需重启 ETQ 服务使配置生效，不支持热加载。
+
+四、常见部署问题
+--------------
+1. 启动报 ClassNotFoundException：多为 JDK 版本低于 17，请检查 java -version
+2. 数据库连接失败：确认 MYSQL_HOST 和端口是否正确，且 etq 库已创建
+3. 端口占用：执行 netstat -tlnp | grep 8080 查看占用进程

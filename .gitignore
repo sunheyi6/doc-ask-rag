@@ -26,3 +26,8 @@ logs/
 *.pdf
 *.txt
 *.docx
+
+# 内置示例文档（应用资源，需要入库，其他地方忽略 .txt）
+!src/rag_agent/data/
+!src/rag_agent/data/sample_docs/
+!src/rag_agent/data/sample_docs/*.txt
