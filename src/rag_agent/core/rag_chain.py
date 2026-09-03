@@ -347,6 +347,24 @@ class RAGChain:
     def _get_sources(self, question: str, k: int = 3, target_filename: Optional[str] = None) -> List[Dict[str, Any]]:
         """获取引用来源"""
         metadata_filter = {"filename": target_filename} if target_filename else None
+        
+        if config.ENABLE_HYBRID_RETRIEVAL:
+            # 混合检索：融合分数越大越相关（与向量距离含义相反）
+            docs_with_scores = self.vectorstore.hybrid_search(
+                question,
+                k=k,
+                metadata_filter=metadata_filter
+            )
+            sources = []
+            for doc, score in docs_with_scores[:k]:
+                sources.append({
+                    "content": doc.page_content[:300] + "..." if len(doc.page_content) > 300 else doc.page_content,
+                    "score": round(score, 4),
+                    "metadata": doc.metadata,
+                    "score_type": "fusion",
+                })
+            return sources
+        
         docs_with_scores = self.vectorstore.similarity_search(
             question,
             k=k,
@@ -359,7 +377,7 @@ class RAGChain:
                 sources.append({
                     "content": doc.page_content[:300] + "..." if len(doc.page_content) > 300 else doc.page_content,
                     "score": round(score, 3),
-                    "metadata": doc.metadata
+                    "metadata": doc.metadata,
                 })
         
         return sources
